@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 368" role="img" aria-label="台詞チェック帳の 1 周。Claude が台本を並べ、あなたがチェックし、Claude が直しを読み取る。直しがあれば次の版でもう一周し、直しが 0 になったら製本する">
+ <rect x="0" y="0" width="1200" height="368" fill="#FFFFFF"/>
+ <text x="24" y="34" font-size="18" font-weight="700" fill="#212529" font-family="sans-serif">台詞チェック帳の 1 周</text>
+ <rect x="16" y="52" width="1168" height="140" rx="14" fill="#F6F8FA"/>
+ <rect x="16" y="212" width="1168" height="140" rx="14" fill="#F6F8FA"/>
+ <g font-family="sans-serif" font-size="15" font-weight="700">
+  <rect x="28" y="106" width="84" height="32" rx="16" fill="#2563EB"/><text x="70" y="127" text-anchor="middle" fill="#FFFFFF">あなた</text>
+  <rect x="28" y="266" width="84" height="32" rx="16" fill="#FFFFFF" stroke="#212529" stroke-width="2"/><text x="70" y="287" text-anchor="middle" fill="#212529">Claude</text>
+ </g>
+ <g fill="none" stroke="#64707C" stroke-width="2.5">
+  <path d="M240 262 V122 H392"/>
+  <path d="M600 122 H800 V250"/>
+  <path d="M700 300 H608"/>
+  <path d="M500 262 V170"/>
+  <path d="M900 300 H1060 V170"/>
+ </g>
+ <g fill="#64707C">
+  <path d="M392 114 L404 122 L392 130 Z"/>
+  <path d="M792 250 L800 262 L808 250 Z"/>
+  <path d="M608 292 L596 300 L608 308 Z"/>
+  <path d="M492 170 L500 158 L508 170 Z"/>
+  <path d="M1052 170 L1060 158 L1068 170 Z"/>
+ </g>
+ <g font-family="sans-serif" font-size="13" fill="#64707C">
+  <text x="612" y="112">保存して「反映して」と送る</text>
+  <text x="654" y="322" text-anchor="middle">直しあり</text>
+  <text x="512" y="222">もう一周</text>
+  <text x="914" y="290" fill="#16A34A" font-weight="700">直しが 0</text>
+ </g>
+ <g font-family="sans-serif">
+  <rect x="140" y="262" width="200" height="76" rx="12" fill="#FFFFFF" stroke="#212529" stroke-width="2"/>
+  <text x="240" y="294" text-anchor="middle" font-size="17" font-weight="700" fill="#212529">① 台本を並べる</text>
+  <text x="240" y="318" text-anchor="middle" font-size="13" fill="#64707C">声つきで 1 行ずつ</text>
+  <rect x="404" y="84" width="196" height="76" rx="12" fill="#2563EB"/>
+  <text x="502" y="116" text-anchor="middle" font-size="17" font-weight="700" fill="#FFFFFF">② チェックする</text>
+  <text x="502" y="140" text-anchor="middle" font-size="13" fill="#FFFFFF">印・ペン・ゴミ箱で直す</text>
+  <rect x="700" y="262" width="200" height="76" rx="12" fill="#FFFFFF" stroke="#212529" stroke-width="2"/>
+  <text x="800" y="294" text-anchor="middle" font-size="17" font-weight="700" fill="#212529">③ 直しを読み取る</text>
+  <text x="800" y="318" text-anchor="middle" font-size="13" fill="#64707C">声の候補もここで作る</text>
+  <rect x="400" y="262" width="200" height="76" rx="12" fill="#FFFFFF" stroke="#212529" stroke-width="2"/>
+  <text x="500" y="294" text-anchor="middle" font-size="17" font-weight="700" fill="#212529">④ 次の版を出す</text>
+  <text x="500" y="318" text-anchor="middle" font-size="13" fill="#64707C">前回直した行に印</text>
+  <rect x="960" y="84" width="200" height="76" rx="12" fill="#16A34A"/>
+  <text x="1060" y="116" text-anchor="middle" font-size="17" font-weight="700" fill="#FFFFFF">⑤ 製本する</text>
+  <text x="1060" y="140" text-anchor="middle" font-size="13" fill="#FFFFFF">決めるのはあなた</text>
+ </g>
+</svg>

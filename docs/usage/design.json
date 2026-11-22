@@ -1,0 +1,25 @@
+{
+ "reader": "このリポジトリを開いた人。台本を書いていて、台詞を声で聞きながら直したい。Claude Code は使える",
+ "reader_knows": [
+  "台本",
+  "Claude Code",
+  "音声合成"
+ ],
+ "takeaway": "台詞チェック帳では、声つきで 1 行ずつ並べた台本に印・ペン・ゴミ箱で直しを付けると Claude が次の版を出し、直しが無くなれば製本まで進む",
+ "support": [
+  "直しは行ごとに保存され、PC とスマホで同じものが見える",
+  "声を変えたい行は 3 つの候補から選べ、候補は Claude が次の返事で作る",
+  "次の版では前回直した行に印が付き、その行だけを見直せる"
+ ],
+ "subject_anchor": "台詞チェック帳",
+ "avoid_terms": [
+  "db",
+  "artifact",
+  "ArtifactData",
+  "for_req",
+  "if_version",
+  "reading_only",
+  "voice_new",
+  "snapshot"
+ ]
+}

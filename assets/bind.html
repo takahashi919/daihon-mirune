@@ -1,0 +1,222 @@
+<title>製本の確認</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Maru+Gothic:wght@700;900&display=swap">
+<style>
+/* Layout: one column. A stamped title block, the numbers that matter, a run-through player over the full script,
+   the check history, then the one question. Same tokens as the 台詞チェック帳 so it reads as the next page of it. */
+:root {
+  --paper: #f5f3ee; --card: #fffdf8; --ink: #1e2740; --muted: #646b7d; --rule: #dad5ca;
+  --accent: #284b80; --ok: #2c7a4b; --fix: #c4410b; --seal: #b3261e; --chip-ink: #ffffff;
+  --font-body: "BIZ UDPGothic", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+  --font-display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #14161c; --card: #1c1f27; --ink: #e9e7e2; --muted: #9ba1af; --rule: #2c303b;
+    --accent: #93b2e8; --ok: #6fcf97; --fix: #ff9b63; --seal: #ff8a80; --chip-ink: #10131a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #14161c; --card: #1c1f27; --ink: #e9e7e2; --muted: #9ba1af; --rule: #2c303b;
+  --accent: #93b2e8; --ok: #6fcf97; --fix: #ff9b63; --seal: #ff8a80; --chip-ink: #10131a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.7; margin: 0; }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 24px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.head { display: flex; gap: 18px; align-items: center; }
+.seal { flex: none; width: 76px; height: 76px; border: 3px solid var(--seal); border-radius: 50%; color: var(--seal); display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 900; font-size: 1.15rem; line-height: 1.1; text-align: center; transform: rotate(-8deg); }
+.seal span { display: block; }
+.eyebrow { font-size: .78rem; color: var(--muted); letter-spacing: .08em; margin: 0; }
+h1 { font-family: var(--font-display); font-size: 1.45rem; line-height: 1.35; margin: 2px 0 0; text-wrap: balance; }
+.id { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .8rem; color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 20px; }
+.stat { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; }
+.stat b { display: block; font-family: var(--font-display); font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+.stat span { font-size: .76rem; color: var(--muted); }
+h2 { font-family: var(--font-display); font-size: 1.02rem; color: var(--accent); margin: 28px 0 8px; }
+.player { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
+.pbar { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--rule); flex-wrap: wrap; }
+.pbtn { font: inherit; font-weight: 700; color: var(--chip-ink); background: var(--accent); border: 0; border-radius: 999px; padding: 6px 16px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.pbtn svg { width: 1.1em; height: 1.1em; }
+.now { font-size: .82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.list { max-height: 360px; overflow-y: auto; }
+.list ol { list-style: none; margin: 0; padding: 0; }
+.list li { display: grid; grid-template-columns: 2.6em auto minmax(0, 1fr); gap: 8px; align-items: baseline; padding: 6px 12px; border-top: 1px solid var(--rule); cursor: pointer; }
+.list li:first-child { border-top: 0; }
+.list li.scene { display: block; cursor: default; font-size: .78rem; color: var(--accent); font-weight: 700; background: var(--paper); padding: 4px 12px; }
+.list li.on { background: color-mix(in srgb, var(--accent) 12%, var(--card)); }
+.list .num { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .82rem; }
+.who { color: var(--chip-ink); font-weight: 700; font-size: .74rem; padding: 0 8px; border-radius: 6px; white-space: nowrap; }
+.list .t { overflow-wrap: anywhere; }
+.list .y { display: block; font-size: .76rem; color: var(--muted); }
+table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 7px 10px; border-top: 1px solid var(--rule); font-size: .88rem; }
+th { border-top: 0; font-size: .76rem; color: var(--muted); font-weight: 700; }
+td.zero { color: var(--muted); }
+tr.last td { font-weight: 700; color: var(--ok); }
+.tablewrap { overflow-x: auto; }
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.checks li { display: flex; gap: 8px; align-items: center; }
+.checks .good { color: var(--ok); } .checks .warn { color: var(--fix); font-weight: 700; }
+.checks svg { width: 1.2em; height: 1.2em; flex: none; }
+.ask { margin-top: 28px; background: var(--card); border: 2px solid var(--accent); border-radius: 14px; padding: 18px; }
+.ask h2 { margin-top: 0; font-size: 1.15rem; color: var(--ink); }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.choice { font: inherit; font-weight: 700; font-size: 1rem; border-radius: 12px; padding: 14px; cursor: pointer; border: 2px solid var(--rule); background: transparent; color: var(--ink); display: flex; gap: 8px; align-items: center; justify-content: center; }
+.choice svg { width: 1.4em; height: 1.4em; }
+.choice.bind { border-color: var(--seal); color: var(--seal); }
+.choice.revise { border-color: var(--fix); color: var(--fix); }
+.choice[aria-pressed="true"].bind { background: var(--seal); color: var(--chip-ink); }
+.choice[aria-pressed="true"].revise { background: var(--fix); color: var(--chip-ink); }
+textarea { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; width: 100%; margin-top: 10px; }
+.state { margin-top: 10px; font-size: .88rem; color: var(--muted); min-height: 1.5em; }
+.state.good { color: var(--ok); font-weight: 700; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 560px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .choices { grid-template-columns: 1fr; } .seal { width: 60px; height: 60px; font-size: .95rem; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <div class="head">
+    <div class="seal" aria-hidden="true"><div><span>製</span><span>本</span></div></div>
+    <div>
+      <p class="eyebrow">製本の確認</p>
+      <h1 id="title">読み込み中…</h1>
+      <div class="id" id="epid"></div>
+    </div>
+  </div>
+  <div class="stats" id="stats"></div>
+
+  <h2>通しで聞く</h2>
+  <div class="player">
+    <div class="pbar">
+      <button class="pbtn" id="playAll" type="button"></button>
+      <span class="now" id="now" aria-live="polite">行を押すと、そこから流れます</span>
+    </div>
+    <div class="list"><ol id="lines"></ol></div>
+  </div>
+
+  <h2>チェックの履歴</h2>
+  <div class="tablewrap"><table><thead><tr><th>回</th><th>訂正</th><th>削除</th><th>追加</th><th>声</th></tr></thead><tbody id="rounds"></tbody></table></div>
+
+  <h2>製本の前に</h2>
+  <ul class="checks" id="checks"></ul>
+
+  <section class="ask" aria-labelledby="askTitle">
+    <h2 id="askTitle">この台本で製本してよいですか？</h2>
+    <p class="eyebrow" style="letter-spacing:0">製本すると、台本・行ごとの声・通しの音声をひとまとめにして書き出します。</p>
+    <div class="choices">
+      <button class="choice bind" id="ansBind" type="button" aria-pressed="false"></button>
+      <button class="choice revise" id="ansRevise" type="button" aria-pressed="false"></button>
+    </div>
+    <textarea id="note" rows="2" placeholder="まだ直す時は、気になる所をひとことで（任意）"></textarea>
+    <div class="state" id="state" aria-live="polite"></div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const SVG = (d) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + "</svg>";
+  const IC = {
+    play: '<path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/>', pause: '<path d="M8 5v14M16 5v14"/>',
+    book: '<path d="M5 4.5h9.5a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9.5"/>',
+    pen: '<path d="M15.5 4.5l4 4L8 20H4v-4z"/><path d="M13 7l4 4"/>',
+    check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>', warn: '<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17v.5"/>'
+  };
+  function el(tag, attrs, kids) {
+    const e = document.createElement(tag);
+    for (const k in (attrs || {})) { if (k === "text") e.textContent = attrs[k]; else if (k === "html") e.innerHTML = attrs[k]; else e.setAttribute(k, attrs[k]); }
+    (kids || []).forEach((c) => c && e.appendChild(c));
+    return e;
+  }
+  const mmss = (s) => Math.floor(s / 60) + ":" + String(Math.round(s % 60)).padStart(2, "0");
+  let data = null, db = null, answer = null, idx = -1, audio = null;
+
+  $("ansBind").innerHTML = SVG(IC.book) + "製本する";
+  $("ansRevise").innerHTML = SVG(IC.pen) + "まだ直す";
+  function paintPlay() { $("playAll").innerHTML = SVG(audio && !audio.paused ? IC.pause : IC.play) + (audio && !audio.paused ? "止める" : idx > 0 ? "続きから" : "最初から通しで聞く"); }
+
+  // ---- run-through player: plays the lines one after another, highlighting the one speaking ----
+  function playFrom(i) {
+    const playable = data.lines.map((l, k) => l.audio ? k : -1).filter((k) => k >= i);
+    if (!playable.length) { stop(); $("now").textContent = "最後まで流れました"; idx = -1; paintPlay(); return; }
+    idx = playable[0];
+    const l = data.lines[idx];
+    if (audio) audio.pause();
+    audio = new Audio(l.audio);
+    audio.onended = () => playFrom(idx + 1);
+    audio.onerror = () => playFrom(idx + 1);
+    audio.play().catch(() => { paintPlay(); });
+    document.querySelectorAll("#lines li.on").forEach((x) => x.classList.remove("on"));
+    const li = $("ln-" + l.n); if (li) { li.classList.add("on"); li.scrollIntoView({ block: "nearest" }); }
+    $("now").textContent = String(l.n).padStart(3, "0") + " / " + String(data.lines.length).padStart(3, "0") + "　" + (data.speakers[l.sp] || {}).name;
+    paintPlay();
+  }
+  function stop() { if (audio) audio.pause(); paintPlay(); }
+  $("playAll").onclick = () => { if (audio && !audio.paused) stop(); else if (audio && idx >= 0) { audio.play(); paintPlay(); } else playFrom(0); };
+
+  function render() {
+    $("title").textContent = data.title; $("epid").textContent = data.id;
+    const sp = Object.keys(data.speakers);
+    [["行", data.lines.length], ["話し手", sp.length], ["通しの長さ", mmss(data.duration)], ["チェック", data.rounds.length + " 回"]]
+      .forEach(([k, v]) => $("stats").appendChild(el("div", { class: "stat" }, [el("b", { text: String(v) }), el("span", { text: k })])));
+    let scene = null;
+    data.lines.forEach((l, k) => {
+      if (l.scene !== scene) { scene = l.scene; $("lines").appendChild(el("li", { class: "scene", text: l.sceneName || l.scene })); }
+      const s = data.speakers[l.sp] || { name: l.sp }, who = el("span", { class: "who", text: s.name }); who.style.background = s.color || "#888";
+      const t = el("span", { class: "t", text: l.text });
+      if (l.tts && l.tts !== l.text) t.appendChild(el("span", { class: "y", text: "読み: " + l.tts }));
+      const li = el("li", { id: "ln-" + l.n, tabindex: "0", title: "ここから聞く" }, [el("span", { class: "num", text: String(l.n).padStart(3, "0") }), who, t]);
+      li.onclick = () => playFrom(k); li.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); playFrom(k); } };
+      $("lines").appendChild(li);
+    });
+    data.rounds.forEach((r, k) => {
+      const tr = el("tr", { class: k === data.rounds.length - 1 ? "last" : "" }, [el("td", { text: r.id })]);
+      ["fix", "del", "add", "voice"].forEach((f) => tr.appendChild(el("td", { class: r[f] ? "" : "zero", text: String(r[f] || 0) })));
+      $("rounds").appendChild(tr);
+    });
+    if (!data.rounds.length) $("rounds").appendChild(el("tr", {}, [el("td", { colspan: "5", text: "履歴なし" })]));
+    const c = data.checks || {};
+    [[!c.over50, "50 字を超える台詞はありません", (c.over50 || 0) + " 行が 50 字を超えています"],
+     [!c.noAudio, "全部の行に声があります", (c.noAudio || 0) + " 行に声がありません"],
+     [!c.pendingVoices, "作りかけの声の候補はありません", (c.pendingVoices || 0) + " 行の声の候補がまだできていません"],
+     [c.lastClean, "最後のチェックで直しはありませんでした", "最後のチェックにまだ直しがあります"]]
+      .forEach(([ok, good, bad]) => $("checks").appendChild(el("li", { class: ok ? "good" : "warn", html: SVG(ok ? IC.check : IC.warn) }, [document.createTextNode(ok ? good : bad)])));
+    paintPlay();
+  }
+
+  // ---- the answer lives in this page's db (bind/answer); Claude reads it on its next turn ----
+  function paintAnswer() {
+    $("ansBind").setAttribute("aria-pressed", String(!!answer && answer.choice === "bind"));
+    $("ansRevise").setAttribute("aria-pressed", String(!!answer && answer.choice === "revise"));
+    const st = $("state");
+    if (!db) { st.className = "state"; st.textContent = "この表示では答えを保存できません。チャットで「製本して」か「まだ直す」と送ってください。"; return; }
+    if (!answer) { st.className = "state"; st.textContent = ""; return; }
+    st.className = "state good";
+    st.textContent = answer.choice === "bind" ? "「製本する」で答えました。チャットで何か送ると、次の返事で製本します。" : "「まだ直す」で答えました。チャットで何か送ると、直したい所を伺います。";
+  }
+  async function send(choice) {
+    if (!db) return;
+    const prev = answer;
+    answer = { choice, note: $("note").value.trim(), id: data.id, at: new Date().toISOString() };
+    paintAnswer();
+    try { await db.doc("bind/answer").set(answer); }
+    catch (e) { answer = prev; paintAnswer(); $("state").className = "state"; $("state").textContent = "保存できませんでした。もう一度押してください。"; }
+  }
+  $("ansBind").onclick = () => send("bind");
+  $("ansRevise").onclick = () => send("revise");
+
+  (async () => {
+    try { data = await (await fetch("bind.json", { cache: "no-store" })).json(); }
+    catch (e) { $("title").textContent = "製本の材料を読み込めませんでした"; return; }
+    render();
+    try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; } catch (e) { db = null; }
+    if (db) db.doc("bind/answer").onSnapshot((d) => { const v = d.exists ? d.data() : null; if (v && v.id === data.id) { answer = v; if (v.note && !$("note").value) $("note").value = v.note; } paintAnswer(); }, () => {});
+    paintAnswer();
+  })();
+})();
+</script>

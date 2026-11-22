@@ -1,0 +1,21 @@
+[
+ {"scene": "01_hajime", "speaker": "aya", "text": "台本ができたんだけど、セリフを一行ずつ見てほしいの。"},
+ {"scene": "01_hajime", "speaker": "ken", "text": "全部読み上げて、直すところをメモすればいいのかな？"},
+ {"scene": "01_hajime", "speaker": "navi", "text": "それなら台詞チェック帳を使いましょう。声つきで一行ずつ並びます。"},
+ {"scene": "01_hajime", "speaker": "ken", "text": "声つきなんだ。聞きながら直せるのは助かるね。"},
+ {"scene": "02_touroku", "speaker": "navi", "text": "最初に一回だけ、話者登録のフォームで話し手を登録します。", "tts_text": "最初に一回だけ、わしゃとうろくのフォームで話し手を登録します。"},
+ {"scene": "02_touroku", "speaker": "aya", "text": "IDは台本のspeakerと同じにするんだよね。", "tts_text": "アイディーは台本のスピーカーと同じにするんだよね。"},
+ {"scene": "02_touroku", "speaker": "navi", "text": "はい。表示名と色、それから声のIDも入れられます。", "tts_text": "はい。表示名と色、それから声のアイディーも入れられます。"},
+ {"scene": "02_touroku", "speaker": "ken", "text": "登録済みの人は別のタブだから、うっかり消さずにすむね。"},
+ {"scene": "02_touroku", "speaker": "navi", "text": "APIキーはフォームには書かず、.envに置いてください。", "tts_text": "エーピーアイキーはフォームには書かず、ドットエンブに置いてください。"},
+ {"scene": "03_check", "speaker": "aya", "text": "ページを開いたら、最初は全部「採用」になってるの？"},
+ {"scene": "03_check", "speaker": "navi", "text": "そうです。直したい行だけ「訂正」を押して書きかえます。"},
+ {"scene": "03_check", "speaker": "ken", "text": "読み方だけ直したいときは？"},
+ {"scene": "03_check", "speaker": "navi", "text": "「読みの直し」の欄に、ひらがなで書いてください。"},
+ {"scene": "03_check", "speaker": "aya", "text": "セリフを足したいときは、この後に追加ボタンだね。"},
+ {"scene": "03_check", "speaker": "navi", "text": "最後に行ごとの「保存」を押すのを忘れずに。"},
+ {"scene": "04_hanei", "speaker": "ken", "text": "保存したら、あとはどうするの？"},
+ {"scene": "04_hanei", "speaker": "navi", "text": "Claudeに「台詞チェックを反映して」と伝えるだけです。", "tts_text": "クロードに、台詞チェックを反映して、と伝えるだけです。"},
+ {"scene": "04_hanei", "speaker": "aya", "text": "直した台本は、次の版として別のIDで出すんだよね。", "tts_text": "直した台本は、次の版として別のアイディーで出すんだよね。"},
+ {"scene": "04_hanei", "speaker": "ken", "text": "行番号がずれないようにか。よし、まずは使ってみよう！"}
+]

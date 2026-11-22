@@ -1,0 +1,11 @@
+{
+ "tts": {
+  "provider": "fish",
+  "model": "s2.1-pro-free"
+ },
+ "speakers": [
+  {"id": "aya", "name": "アヤ", "color": "#FF7F50", "voice": "5161d41404314212af1254556477c17d"},
+  {"id": "ken", "name": "ケン", "color": "#4CD97E", "voice": "45c5d3723c9c42f598e4776dcfd5f02d"},
+  {"id": "navi", "name": "ナビ", "color": "#4DB8FF", "voice": "0089dce5fefb4c6ba9b9f2f0debe1ddc"}
+ ]
+}

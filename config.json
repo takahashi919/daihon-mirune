@@ -1,0 +1,9 @@
+{
+ "tts": {
+  "provider": "fish",
+  "model": "s2.1-pro-free"
+ },
+ "speakers": [
+  {"id": "narrator", "name": "ナレーター", "color": "#4DB8FF", "voice": ""}
+ ]
+}

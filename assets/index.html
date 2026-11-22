@@ -1,0 +1,932 @@
+<title>台詞チェック帳</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Maru+Gothic:wght@700;900&display=swap">
+<style>
+/* Layout: one reading column of script lines, each a proof slip with the verdict on its right edge; a sticky tally bar on top. */
+:root {
+  --paper: #f5f3ee;
+  --card: #fffdf8;
+  --ink: #1e2740;
+  --muted: #646b7d;
+  --rule: #dad5ca;
+  --accent: #284b80;
+  --ok: #2c7a4b;
+  --fix: #c4410b;
+  --del: #b42318;
+  --add: #1d5fa8;
+  --chip-ink: #ffffff;
+  --font-body: "BIZ UDPGothic", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+  --font-display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #14161c; --card: #1c1f27; --ink: #e9e7e2; --muted: #9ba1af; --rule: #2c303b;
+    --accent: #93b2e8; --ok: #6fcf97; --fix: #ff9b63; --del: #ff8a80; --add: #82b8ff; --chip-ink: #10131a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #14161c; --card: #1c1f27; --ink: #e9e7e2; --muted: #9ba1af; --rule: #2c303b;
+  --accent: #93b2e8; --ok: #6fcf97; --fix: #ff9b63; --del: #ff8a80; --add: #82b8ff; --chip-ink: #10131a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink); font-family: var(--font-body);
+  font-size: 15px; line-height: 1.65; margin: 0;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 18px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font-family: var(--font-display); font-weight: 900; font-size: 1.55rem; margin: 0; text-wrap: balance; letter-spacing: .02em; }
+.lead { color: var(--muted); font-size: .9rem; margin: 6px 0 0; max-width: 65ch; }
+.ep-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+select, textarea, input[type=text] { font: inherit; color: var(--ink); background: var(--card); border: 1px solid var(--rule); border-radius: 8px; padding: 7px 9px; width: 100%; }
+select { width: auto; max-width: 100%; }
+textarea:focus, input:focus, select:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper);
+  border-bottom: 1px solid var(--rule); padding: 10px 0; margin-top: 12px;
+  display: flex; gap: 8px 14px; flex-wrap: wrap; align-items: center; font-size: .88rem;
+}
+.tally { display: flex; gap: 6px; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
+.tally > span { padding: 1px 9px; border-radius: 999px; border: 1px solid var(--rule); display: inline-flex; align-items: center; gap: 4px; font-variant-numeric: tabular-nums; }
+.tally .ic { width: 1.25em; height: 1.25em; }
+.tally > .t-ok { color: var(--ok); border-color: var(--ok); }
+.tally .t-fix { color: var(--fix); border-color: var(--fix); } .tally .t-del { color: var(--del); border-color: var(--del); } .tally .t-add { color: var(--add); border-color: var(--add); }
+.sync { color: var(--muted); font-size: .8rem; margin-left: auto; }
+.nav { display: flex; gap: 6px; flex-wrap: wrap; width: 100%; }
+.nav a { color: var(--accent); text-decoration: none; font-size: .82rem; padding: 1px 8px; border: 1px solid var(--rule); border-radius: 999px; }
+label.only { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+h2.scene { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; margin: 26px 0 6px; color: var(--accent); scroll-margin-top: 140px; }
+h2.scene small { color: var(--muted); font-family: var(--font-body); font-weight: 400; font-size: .78rem; margin-left: 6px; }
+.slip { background: var(--card); border: 1px solid var(--rule); border-left: 5px solid var(--rule); border-radius: 10px; padding: 10px 12px; margin: 8px 0; }
+.slip.st-ok { border-left-color: var(--ok); }
+.slip.st-fix { border-left-color: var(--fix); }
+.slip.st-del { border-left-color: var(--del); opacity: .72; }
+.slip.st-del .line { text-decoration: line-through; }
+.head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.num { font-variant-numeric: tabular-nums; color: var(--muted); font-weight: 700; min-width: 2.6em; }
+.who { color: var(--chip-ink); font-weight: 700; font-size: .78rem; padding: 1px 9px; border-radius: 6px; }
+.play { font: inherit; font-size: .82rem; color: var(--ink); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: 3px 12px; min-height: 30px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.play:disabled { opacity: .4; cursor: default; }
+.play.on { border-color: var(--accent); color: var(--accent); }
+.verdict { margin-left: auto; display: inline-flex; border: 1px solid var(--rule); border-radius: 9px; overflow: hidden; }
+.verdict button { font: inherit; font-size: .86rem; background: transparent; color: var(--ink); border: 0; border-left: 1px solid var(--rule); padding: 4px 12px; min-width: 48px; min-height: 36px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.verdict button .ic { width: 1.45em; height: 1.45em; }
+.verdict .v-ok { color: var(--ok); } .verdict .v-fix { color: var(--fix); } .verdict .v-del { color: var(--del); }
+.verdict button:first-child { border-left: 0; }
+.verdict button[aria-pressed="true"].v-ok { background: var(--ok); color: var(--chip-ink); font-weight: 700; }
+.verdict button[aria-pressed="true"].v-fix { background: var(--fix); color: var(--chip-ink); font-weight: 700; }
+.verdict button[aria-pressed="true"].v-del { background: var(--del); color: var(--chip-ink); font-weight: 700; }
+.line { font-size: 1.06rem; margin: 6px 0 2px; overflow-wrap: anywhere; }
+.yomi { font-size: .8rem; color: var(--muted); overflow-wrap: anywhere; }
+.fixbox { display: grid; gap: 6px; margin-top: 8px; }
+.cap { font-size: .78rem; color: var(--muted); }
+.count { font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.count.over { color: var(--del); font-weight: 700; }
+.addbtn { margin-top: 8px; font: inherit; font-size: .84rem; color: var(--add); background: transparent; border: 1px dashed var(--add); border-radius: 8px; padding: 3px 12px; min-height: 32px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.addbtn .ic { width: 1.35em; height: 1.35em; }
+.added { background: var(--card); border: 2px dashed var(--add); border-radius: 10px; padding: 10px 12px; margin: 8px 0 8px 22px; display: grid; gap: 6px; }
+.added .head b { color: var(--add); font-size: .88rem; }
+.ghost { margin-left: auto; font: inherit; font-size: .82rem; color: var(--del); background: transparent; border: 0; cursor: pointer; display: inline-flex; align-items: center; padding: 4px; }
+.ghost .ic { width: 1.3em; height: 1.3em; }
+.panel { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 12px; }
+pre#out { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .85rem; margin: 0; max-height: 360px; overflow: auto; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+.primary { font: inherit; font-weight: 700; color: var(--chip-ink); background: var(--accent); border: 0; border-radius: 9px; padding: 10px 18px; cursor: pointer; }
+.secondary { font: inherit; color: var(--ink); background: transparent; border: 1px solid var(--rule); border-radius: 9px; padding: 9px 14px; cursor: pointer; }
+.secondary.armed { border-color: var(--del); color: var(--del); font-weight: 700; }
+.note { color: var(--muted); font-size: .85rem; }
+.empty { padding: 30px 12px; text-align: center; color: var(--muted); }
+.savebar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.savebar .addbtn { margin-top: 0; }
+.save { font: inherit; font-size: .86rem; font-weight: 700; color: var(--muted); background: transparent; border: 1px solid var(--rule); border-radius: 8px; padding: 4px 16px; min-height: 34px; cursor: pointer; margin-left: auto; display: inline-flex; align-items: center; gap: 4px; }
+.save .ic { width: 1.3em; height: 1.3em; }
+.save:disabled { cursor: default; opacity: .55; }
+.save.ready { color: var(--chip-ink); background: var(--accent); border-color: var(--accent); }
+.rowstate { font-size: .8rem; color: var(--muted); display: inline-flex; align-items: center; min-width: 1.2em; }
+.rowstate.warn { color: var(--fix); font-weight: 700; }
+.rowstate.good { color: var(--ok); }
+.slip.dirty { box-shadow: 0 0 0 2px var(--fix) inset; }
+.unsaved { color: var(--fix); font-weight: 700; font-size: .85rem; display: inline-flex; align-items: center; gap: 2px; }
+.voicebar:empty { display: none; }
+.voicebar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+.regen { font: inherit; font-size: .8rem; color: var(--accent); background: transparent; border: 1px solid var(--accent); border-radius: 999px; padding: 3px 11px; min-height: 30px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.regen .ic { width: 1.3em; height: 1.3em; }
+.regen.armed { background: var(--accent); color: var(--chip-ink); font-weight: 700; }
+.regen:disabled { opacity: .5; cursor: default; }
+.vstate { font-size: .8rem; color: var(--muted); overflow-wrap: anywhere; min-width: 0; display: inline-flex; align-items: center; gap: 5px; }
+.vstate.wait { color: var(--fix); }
+.cands { display: flex; gap: 8px; flex-wrap: wrap; width: 100%; }
+.cand { display: inline-flex; border: 1px solid var(--rule); border-radius: 9px; overflow: hidden; }
+.cand button { font: inherit; font-size: .82rem; background: transparent; color: var(--ink); border: 0; padding: 4px 10px; min-height: 32px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.cand .pickbtn { color: var(--muted); }
+.cand button + button { border-left: 1px solid var(--rule); }
+.cand.picked { border-color: var(--accent); }
+.cand.picked .pickbtn { background: var(--accent); color: var(--chip-ink); }
+.arrow { color: var(--muted); font-size: .8rem; }
+.spsel { max-width: 16em; }
+.ic { width: 1.2em; height: 1.2em; display: inline-block; flex: none; vertical-align: -.22em; }
+.ic svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 8px 0 0; padding: 0; list-style: none; font-size: .82rem; color: var(--muted); }
+.legend li { display: inline-flex; align-items: center; gap: 5px; }
+.legend .ic { width: 1.35em; height: 1.35em; }
+.legend .l-ok { color: var(--ok); } .legend .l-fix { color: var(--fix); } .legend .l-del { color: var(--del); } .legend .l-add { color: var(--add); } .legend .l-acc { color: var(--accent); }
+.fixrow { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; align-items: start; }
+.fixrow > .ic { margin-top: 9px; color: var(--muted); }
+.fixrow .count { grid-column: 2; }
+.badge { font-size: .74rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* 台詞 / 話し手 views */
+.tabs { display: flex; gap: 4px; margin-top: 14px; border-bottom: 1px solid var(--rule); }
+.tabs button { font: inherit; font-size: .9rem; font-weight: 700; color: var(--muted); background: transparent; border: 1px solid transparent; border-bottom: 0; border-radius: 8px 8px 0 0; padding: 7px 14px; cursor: pointer; margin-bottom: -1px; display: inline-flex; align-items: center; gap: 6px; }
+.tabs button[aria-selected="true"] { color: var(--accent); background: var(--card); border-color: var(--rule); }
+.tabs.sub { margin-top: 0; }
+.tabs.sub button { font-size: .85rem; padding: 5px 12px; }
+.sp-panel { background: var(--card); border: 1px solid var(--rule); border-top: 0; border-radius: 0 0 12px 12px; padding: 14px; }
+.roster { list-style: none; margin: 6px 0 0; padding: 0; }
+.roster > li { display: grid; grid-template-columns: 8.5em minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 9px 0; }
+.roster > li + li { border-top: 1px dashed var(--rule); }
+.roster .who { justify-self: start; max-width: 8.5em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.roster .meta { font-size: .82rem; color: var(--muted); min-width: 0; }
+.roster .meta span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.roster .meta b { color: var(--ink); font-weight: 400; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.roster .acts { display: flex; gap: 6px; }
+.roster .acts button { font: inherit; background: transparent; border: 1px solid var(--rule); border-radius: 8px; min-width: 40px; min-height: 34px; cursor: pointer; color: var(--fix); display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+.roster .acts .del { color: var(--del); border-color: var(--del); }
+.roster .acts .del.armed { background: var(--del); color: var(--chip-ink); font-weight: 700; padding: 0 10px; font-size: .82rem; }
+.roster .edit { grid-column: 1 / -1; background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; padding: 12px; }
+.spfields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.spfields .full { grid-column: 1 / -1; }
+.spfields label { display: block; font-size: .78rem; color: var(--muted); margin-bottom: 2px; }
+.spfields input[type=color] { width: 52px; height: 38px; padding: 2px; }
+.colorline { display: flex; gap: 10px; align-items: center; }
+.hint { font-size: .76rem; color: var(--muted); margin: 2px 0 0; }
+.err { color: var(--del); font-size: .8rem; margin-top: 2px; }
+.err:empty { display: none; }
+.sprow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+.sprow .msg { font-size: .85rem; color: var(--muted); }
+.sprow .msg.good { color: var(--ok); font-weight: 700; }
+@media (max-width: 560px) { .spfields { grid-template-columns: 1fr; } .roster > li { grid-template-columns: 1fr auto; } .roster .meta { grid-column: 1 / -1; grid-row: 2; } }
+.prev { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; font-size: .8rem; color: var(--accent); margin-top: 6px; }
+.pchip { display: inline-flex; gap: 3px; align-items: center; border: 1px solid var(--accent); border-radius: 999px; padding: 0 8px; font-size: .76rem; font-weight: 700; white-space: nowrap; }
+.pchip .ic { width: 1.1em; height: 1.1em; }
+.pchip.strong { background: var(--accent); color: var(--chip-ink); }
+.pnote { flex-basis: 100%; color: var(--muted); font-size: .78rem; overflow-wrap: anywhere; }
+.pnote.ask { color: var(--accent); font-weight: 700; }
+.slip.has-prev { background: color-mix(in srgb, var(--accent) 5%, var(--card)); }
+.saveall { font: inherit; font-size: .84rem; font-weight: 700; color: var(--chip-ink); background: var(--fix); border: 0; border-radius: 8px; padding: 3px 12px; cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+@media (max-width: 520px) { .verdict { margin-left: 0; width: 100%; } .verdict button { flex: 1; } .added { margin-left: 8px; } }
+</style>
+
+<div class="wrap">
+  <h1>台詞チェック帳</h1>
+  <div class="tabs" role="tablist" aria-label="表示">
+    <button type="button" role="tab" id="tab-lines" aria-controls="p-lines" aria-selected="true"><span data-ic="pen"></span>台詞</button>
+    <button type="button" role="tab" id="tab-sp" aria-controls="p-sp" aria-selected="false" tabindex="-1"><span data-ic="person"></span>話し手<span class="count" id="nSp"></span></button>
+  </div>
+  <section id="p-lines" role="tabpanel" aria-labelledby="tab-lines">
+  <ul class="legend" id="legend" aria-label="ボタンの意味"></ul>
+  <div class="ep-row">
+    <label for="ep" class="cap">回</label>
+    <select id="ep"><option>読み込み中…</option></select>
+  </div>
+  <div class="bar">
+    <div class="tally" id="tally"><span>採用 —</span></div>
+    <span class="unsaved" id="unsaved" hidden></span>
+    <button class="saveall" id="saveAll" type="button" hidden aria-label="未保存をまとめて保存" title="未保存をまとめて保存"></button>
+    <label class="only" for="onlyChanged" title="前回直した行・今回の変更・声の候補がある行だけ出す"><input type="checkbox" id="onlyChanged"> <span id="onlyIc"></span>変更・候補だけ</label>
+    <span class="sync" id="sync" aria-live="polite">接続中…</span>
+    <nav class="nav" id="nav" aria-label="シーン"></nav>
+  </div>
+  <div id="rows"><div class="empty">台詞を読み込んでいます…</div></div>
+
+  <h2 class="scene">全体へのコメント</h2>
+  <textarea id="general" rows="3" placeholder="読み方の全体的な指摘、間の取り方など（任意）"></textarea>
+  <div class="savebar"><button class="save" id="saveGeneral" type="button" disabled aria-label="全体へのコメントを保存" title="保存"></button><span class="rowstate" id="generalState"></span></div>
+
+  <h2 class="scene">結果（保存した変更点だけ）</h2>
+  <div class="panel"><pre id="out"></pre></div>
+  <div class="actions">
+    <button class="primary" id="copy" type="button"><span data-ic="copy"></span> 結果をコピー</button>
+    <button class="secondary" id="reset" type="button"><span data-ic="undo"></span> <span id="resetLabel">この回のチェックを最初に戻す</span></button>
+    <span class="note" id="msg" aria-live="polite"></span>
+  </div>
+  <p class="note">保存したチェック内容は Claude からも読めます。チャットで「台詞チェックを反映して」と伝えるだけで大丈夫です（コピーは予備です）。</p>
+  </section>
+
+  <section id="p-sp" role="tabpanel" aria-labelledby="tab-sp" hidden>
+    <p class="note">ここで登録した話し手は、開いている全員の画面にすぐ出ます（回の作り直しは要りません）。声 ID は次の「声の候補」から使われます。</p>
+    <div class="tabs sub" role="tablist" aria-label="話し手">
+      <button type="button" role="tab" id="stab-list" aria-controls="sp-list" aria-selected="true">登録済み</button>
+      <button type="button" role="tab" id="stab-add" aria-controls="sp-add" aria-selected="false" tabindex="-1"><span data-ic="plus"></span>新しく追加</button>
+    </div>
+    <div class="sp-panel" id="sp-list" role="tabpanel" aria-labelledby="stab-list">
+      <p class="hint">見るだけの一覧です。直すときはペン、消すときはゴミ箱を 2 回押します。</p>
+      <ul class="roster" id="roster"></ul>
+    </div>
+    <form class="sp-panel" id="sp-add" role="tabpanel" aria-labelledby="stab-add" hidden novalidate>
+      <div class="spfields">
+        <div><label for="spId">ID（台本の speaker と同じ）</label><input id="spId" type="text" placeholder="例: navi" autocomplete="off" spellcheck="false"><p class="hint">英数字・_・- だけ。登録後は変えられません</p><div class="err" id="spIdErr"></div></div>
+        <div><label for="spName">表示名</label><input id="spName" type="text" placeholder="例: ナビ"><p class="hint">空なら ID をそのまま出します</p></div>
+        <div><label for="spColor">色</label><div class="colorline"><input id="spColor" type="color"><span class="who" id="spChip">プレビュー</span></div></div>
+        <div><label for="spVoice">声 ID</label><input id="spVoice" type="text" placeholder="空ならサービスの既定の声" autocomplete="off" spellcheck="false"><p class="hint">Fish Audio なら声モデルのページの URL 末尾 32 桁</p><div class="err" id="spVoiceErr"></div></div>
+      </div>
+      <div class="sprow"><button class="primary" type="submit" id="spAddBtn">登録する</button><span class="msg" id="spMsg" aria-live="polite"></span></div>
+    </form>
+  </section>
+</div>
+
+<script>
+// 台詞チェック帳 — map of this script (details: docs/ARCHITECTURE.md)
+//   speakers      rebuildSpeakers(): data/<id>.json speakers + live db speakers/<id> (later wins)
+//   state         draft[n] = what the screen shows, saved[n] = what is known to be stored
+//   saving        saveRow(): one db set per row, stamped with `at`; empty 訂正 is saved as 採用
+//   rendering     rowFor() builds one line, renderAll() the list (and the 変更・候補だけ filter)
+//   voices        requestVoice()/autoVoice() file a request; Claude fills candidates next turn
+//   summary       built from saved[] only, so it matches what Claude reads from the db
+//   incoming      applyDoc()/applyVoice() merge db snapshots without clobbering unsaved work
+//   speakers tab  writeSpeaker()/paintRoster(): the live registry
+// The page never talks to a voice service and never holds a key: it cannot reach outside hosts,
+// and anything in the page is readable by everyone who can open it.
+(() => {
+  // Speakers are not written into the page: each episode's data/<id>.json carries
+  // its own table (built from config.json, which the speaker form writes), so one
+  // page serves any cast. Ids missing from the table still show, under their id.
+  const PALETTE = ["#4DB8FF", "#FF7F50", "#C39BEF", "#4CD97E", "#F2B84B", "#F07FB0", "#5FC9C0", "#A0A8B8"];
+  // Two sources, the later winning: the episode's data/<id>.json (config.json at
+  // build time) and the live registry in the db (speakers/<id>, written by the
+  // 話し手 tab). A registry doc with deleted:true hides a speaker from the pickers
+  // but keeps its name on lines that already use it.
+  let NAMES = {}, COLORS = {}, PICK = [], SPK = {};
+  let baseSpeakers = {}, dbSpeakers = {};
+  function rebuildSpeakers() {
+    NAMES = {}; COLORS = {}; PICK = []; SPK = {};
+    const all = {};
+    Object.keys(baseSpeakers).forEach((id) => { all[id] = Object.assign({ id }, baseSpeakers[id]); });
+    Object.keys(dbSpeakers).forEach((id) => { all[id] = Object.assign({ id }, all[id] || {}, dbSpeakers[id]); });
+    Object.keys(all).forEach((id) => {
+      const s = all[id]; NAMES[id] = s.name || id; COLORS[id] = s.color || PALETTE[Object.keys(COLORS).length % PALETTE.length];
+      if (!s.deleted) { PICK.push(id); SPK[id] = s; }
+    });
+    lines.forEach((l) => { if (l.sp && !NAMES[l.sp]) { NAMES[l.sp] = l.sp; COLORS[l.sp] = PALETTE[Object.keys(COLORS).length % PALETTE.length]; PICK.push(l.sp); SPK[l.sp] = { id: l.sp }; } });
+  }
+  function setSpeakers(table) { baseSpeakers = table || {}; rebuildSpeakers(); }
+  const nameOf = (sp) => NAMES[sp] || sp || "";
+  const NL = String.fromCharCode(10);
+  const $ = (id) => document.getElementById(id);
+  let ep = null, title = "", lines = [], db = null, unsubs = [];
+  // draft[n]: what this screen shows and edits. saved[n]: the last state known
+  // to be stored. A row whose draft differs from saved is "unsaved" and is
+  // never touched by incoming snapshots; snapshots older than the row's last
+  // save (savedAt) are ignored, so a late or cached delivery cannot put back
+  // older text.
+  const draft = {}, saved = {}, savedAt = {}, saving = {};
+  let generalDraft = "", generalSaved = "", generalAt = "";
+  const queue = {};
+  let lastStamp = "";
+
+  // One symbol per meaning, used everywhere it appears (verdict buttons, tally,
+  // legend), so a reviewer reads shape and color instead of words line after line.
+  const ICONS = {
+    seal: '<circle cx="12" cy="12" r="10"/><text x="12" y="16.7" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor" stroke="none" font-family="Hiragino Mincho ProN, Yu Mincho, serif">採</text>',
+    pen: '<path d="M15.5 4.5l4 4L8 20H4v-4z"/><path d="M13 7l4 4"/>',
+    trash: '<path d="M4 7h16"/><path d="M9 7V4.5h6V7"/><path d="M6.5 7l1 13h9l1-13"/><path d="M10 11v5.5M14 11v5.5"/>',
+    play: '<path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/>',
+    save: '<path d="M5 4h11.5L20 7.5V20H5z"/><path d="M8 4v5h7V4"/><path d="M8 20v-6h8v6"/>',
+    add: '<path d="M4 5h16v11H10l-4.5 3.5V16H4z"/><path d="M12 8v5M9.5 10.5h5"/>',
+    regen: '<path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/><path d="M10 9.3v5.4l4.4-2.7z" fill="currentColor"/>',
+    check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+    dot: '<circle cx="12" cy="12" r="5" fill="currentColor" stroke="none"/>',
+    wait: '<path d="M7 4h10M7 20h10M8 4c0 5 8 5 8 8s-8 3-8 8M16 4c0 5-8 5-8 8s8 3 8 8"/>',
+    warn: '<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17v.5"/>',
+    person: '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/>',
+    sound: '<path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>',
+    memo: '<path d="M5 4h14v12l-4 4H5z"/><path d="M15 20v-4h4M8.5 9h7M8.5 12.5h4"/>',
+    radio: '<circle cx="12" cy="12" r="8"/>',
+    radioOn: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/>',
+    copy: '<rect x="8.5" y="8.5" width="11" height="11" rx="1.5"/><path d="M15.5 8.5V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v9.5a1 1 0 0 0 1 1h3.5"/>',
+    undo: '<path d="M9 7L4.5 11.5 9 16"/><path d="M5 11.5h8.5a5 5 0 0 1 0 10H11"/>',
+    filter: '<path d="M4 5h16l-6 7.5V19l-4 1.5v-8z"/>',
+    hist: '<path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/><path d="M12 8v4.5l3 2"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>'
+  };
+  function ic(name) {
+    const s = document.createElement("span"); s.className = "ic";
+    s.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[name] + "</svg>";
+    return s;
+  }
+  // An icon-only button still carries its name for screen readers and a tooltip for the mouse.
+  function ibtn(attrs, name, label, extra) {
+    const b = el("button", Object.assign({ type: "button", "aria-label": label, title: label }, attrs));
+    b.appendChild(ic(name)); if (extra) b.appendChild(extra);
+    return b;
+  }
+  const pad = (n) => String(n).padStart(3, "0");
+  const clone = (s) => ({ st: s.st, sp: s.sp, text: s.text, yomi: s.yomi, memo: s.memo, adds: s.adds.map((a) => ({ sp: a.sp, text: a.text, memo: a.memo })) });
+  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  const blank = (l) => ({ st: "ok", sp: l.sp, text: l.text, yomi: "", memo: "", adds: [] });
+  // A 訂正 that changes nothing (same line, speaker, no reading or memo) is really 採用 —
+  // usually the reviewer only wanted to add a line below it.
+  const emptyFix = (l, s) => s.st === "fix" && s.text.trim() === l.text && !s.yomi.trim() && !s.memo.trim() && (!s.sp || s.sp === l.sp);
+  const stOf = (l, s) => emptyFix(l, s) ? "ok" : s.st;
+  // A saved 訂正 that changes what is heard (speaker, line or reading) asks for voice takes by itself.
+  const changesVoice = (l, s) => s.st === "fix" && ((s.sp && s.sp !== l.sp) || s.text.trim() !== l.text || !!s.yomi.trim());
+  // voices[n]: the voice-candidate request for line n (reviews/<ep>/voices/<n>).
+  // The page writes the request and the pick; Claude's script fills candidates.
+  const voices = {};
+  let armedRegen = null;
+  const lineOf = (n) => lines.find((x) => x.n === n);
+  const isDirty = (n) => !same(draft[n], saved[n]);
+  function stamp() { let t = new Date().toISOString(); if (t <= lastStamp) t = new Date(Date.parse(lastStamp) + 1).toISOString(); lastStamp = t; return t; }
+  function el(tag, attrs, kids) {
+    const e = document.createElement(tag);
+    for (const k in (attrs || {})) { if (k === "text") e.textContent = attrs[k]; else e.setAttribute(k, attrs[k]); }
+    (kids || []).forEach((c) => c && e.appendChild(c));
+    return e;
+  }
+  function setSync(t) { $("sync").textContent = t; }
+
+  // ---- storage ----
+  function localKey() { return "daihon-mirune:" + ep; }
+  function saveLocal() { try { localStorage.setItem(localKey(), JSON.stringify({ saved, generalSaved })); } catch (e) {} }
+  function loadLocal() { try { const s = JSON.parse(localStorage.getItem(localKey()) || "null"); if (s) { Object.keys(s.saved || {}).forEach((n) => { const l = lineOf(Number(n)); if (!l) return; saved[n] = Object.assign({ sp: l.sp }, s.saved[n]); draft[n] = clone(saved[n]); }); generalSaved = generalDraft = s.generalSaved || ""; } } catch (e) {} }
+  function enqueue(path, fn) {
+    const prev = queue[path] || Promise.resolve();
+    const p = prev.then(fn);
+    queue[path] = p.catch(() => {});
+    return p;
+  }
+
+  function saveRow(n) {
+    const l = lineOf(n); if (!l) return Promise.resolve();
+    if (emptyFix(l, draft[n])) { draft[n].st = "ok"; replaceRow(n); }
+    const snapshot = clone(draft[n]);
+    if (!db) { saved[n] = snapshot; saveLocal(); paintRow(n); summary(); return Promise.resolve(); }
+    const at = stamp();
+    saving[n] = true; paintRow(n); setSync("保存中…");
+    const ref = db.doc("reviews/" + ep + "/lines/" + pad(n));
+    return enqueue(ref.path, () => ref.set({ n, st: snapshot.st, sp: snapshot.sp, text: snapshot.text, yomi: snapshot.yomi, memo: snapshot.memo, adds: snapshot.adds, original: l.text, speaker: l.sp, at }))
+      .then(() => { saved[n] = snapshot; savedAt[n] = at; saving[n] = false; paintRow(n); summary(); setSync("保存済み（PC・スマホ共通）"); autoVoice(n); },
+            (err) => { saving[n] = false; paintRow(n); setSync(err && err.code === "invalid_argument" ? "この表示では保存できません" : "保存に失敗しました（" + ((err && err.code) || "error") + "）。もう一度「保存」を押してください"); });
+  }
+  function saveGeneral() {
+    const text = generalDraft;
+    if (!db) { generalSaved = text; saveLocal(); paintGeneral(); summary(); return Promise.resolve(); }
+    const at = stamp(), ref = db.doc("reviews/" + ep);
+    $("generalState").innerHTML = ""; $("generalState").appendChild(ic("wait"));
+    return enqueue(ref.path, () => ref.set({ general: text, title, at }))
+      .then(() => { generalSaved = text; generalAt = at; paintGeneral(); summary(); setSync("保存済み（PC・スマホ共通）"); },
+            (err) => { $("generalState").textContent = "保存に失敗しました（" + ((err && err.code) || "error") + "）"; });
+  }
+
+  // ---- rendering ----
+  function rowFor(l) {
+    const n = l.n, s = draft[n];
+    const D = () => draft[n];   // handlers always read the row's current draft, never a captured copy
+    const row = el("article", { class: "slip st-" + s.st, id: "r" + n });
+    const play = ibtn({ class: "play", id: "play-" + n }, "play", "聞く");
+    play.onclick = () => playSrc(audioOf(l), play);
+    const verdict = el("div", { class: "verdict", role: "group", "aria-label": "判定" });
+    [["ok", "採用", "seal"], ["fix", "訂正", "pen"], ["del", "削除", "trash"]].forEach(([v, lab, name]) => {
+      const b = ibtn({ class: "v-" + v, "aria-pressed": String(s.st === v) }, name, lab);
+      b.onclick = () => {
+        D().st = v;
+        if (v === "fix") { replaceRow(n); const ta = $("fix-" + n); if (ta) ta.focus(); }
+        else { replaceRow(n); saveRow(n); }   // 採用・削除は押した時点で保存
+      };
+      verdict.appendChild(b);
+    });
+    const chip = (sp) => { const c = el("span", { class: "who", text: nameOf(sp) }); c.style.background = COLORS[sp] || "#888"; return c; };
+    const heads = [el("span", { class: "num", text: pad(n) }), chip(l.sp)];
+    if (s.st === "fix" && s.sp && s.sp !== l.sp) heads.push(el("span", { class: "arrow", text: "→" }), chip(s.sp));
+    row.appendChild(el("div", { class: "head" }, heads.concat([play, verdict])));
+    row.appendChild(el("div", { class: "line", text: l.text }));
+    if (l.tts) row.appendChild(el("div", { class: "yomi", text: "読み（音声の元）: " + l.tts }));
+    // What the previous round changed on this line, so the next round checks exactly that.
+    if (l.prev) { row.classList.add("has-prev"); row.appendChild(prevBox(l.prev)); }
+    row.appendChild(el("div", { class: "voicebar", id: "vc-" + n }));
+    const touch = () => { paintRow(n); summary(); };
+    if (s.st === "fix") {
+      const spSel = el("select", { id: "fsp-" + n, class: "spsel", "aria-label": "話し手" });
+      const ids = PICK.slice(); if (s.sp && ids.indexOf(s.sp) < 0) ids.push(s.sp); if (ids.indexOf(l.sp) < 0) ids.unshift(l.sp);
+      ids.forEach((sp) => { const o = el("option", { value: sp, text: nameOf(sp) + (sp === l.sp ? "（今の話し手）" : "") }); if ((s.sp || l.sp) === sp) o.selected = true; spSel.appendChild(o); });
+      spSel.onchange = () => { D().sp = spSel.value; replaceRow(n); const f = $("fsp-" + n); if (f) f.focus(); };
+      const ta = el("textarea", { rows: "2", id: "fix-" + n, "aria-label": "新しい台詞" }); ta.value = s.text;
+      const cnt = el("span", { class: "count" }); paintCount(cnt, s.text);
+      ta.oninput = () => { D().text = ta.value; paintCount(cnt, ta.value); touch(); };
+      const yomi = el("input", { type: "text", id: "yomi-" + n, placeholder: "読みの直し（例：刃 → やいば。読ませたい文をそのまま書いても可）" }); yomi.value = s.yomi;
+      yomi.oninput = () => { D().yomi = yomi.value; touch(); };
+      const memo = el("input", { type: "text", id: "memo-" + n, placeholder: "メモ（任意）" }); memo.value = s.memo;
+      memo.oninput = () => { D().memo = memo.value; touch(); };
+      const frow = (name, label, input, extra) => { const r = el("div", { class: "fixrow" }, [ic(name), input, extra]); r.firstChild.title = label; return r; };
+      ta.setAttribute("placeholder", "新しい台詞（50字以内）");
+      row.appendChild(el("div", { class: "fixbox" }, [frow("person", "話し手", spSel), frow("pen", "新しい台詞", ta, cnt), frow("sound", "読みの直し", yomi), frow("memo", "メモ", memo)]));
+    } else if (s.st === "del") {
+      const memo = el("input", { type: "text", id: "memo-" + n, placeholder: "削除の理由など（任意）" }); memo.value = s.memo;
+      memo.oninput = () => { D().memo = memo.value; touch(); };
+      row.appendChild(el("div", { class: "fixbox" }, [el("div", { class: "fixrow" }, [ic("memo"), memo])]));
+    }
+    const add = ibtn({ class: "addbtn" }, "add", "この後に台詞を追加");
+    add.onclick = () => { D().adds.push({ sp: l.sp, text: "", memo: "" }); replaceRow(n); const t = $("add-" + n + "-" + (D().adds.length - 1)); if (t) t.focus(); };
+    const saveBtn = ibtn({ class: "save", id: "save-" + n }, "save", "この行を保存");
+    const regenSlot = el("span", { id: "vb-" + n });
+    saveBtn.onclick = () => saveRow(n);
+    const rowState = el("span", { class: "rowstate", id: "state-" + n });
+    row.appendChild(el("div", { class: "savebar" }, [add, regenSlot, saveBtn, rowState]));
+    const frag = document.createDocumentFragment();
+    frag.appendChild(row);
+    s.adds.forEach((a, k) => {
+      const box = el("div", { class: "added", id: "a" + n + "-" + k, "data-row": String(n) });
+      const sel = el("select", { "aria-label": "話し手", id: "sp-" + n + "-" + k });
+      const ids = PICK.slice(); if (a.sp && ids.indexOf(a.sp) < 0) ids.push(a.sp);
+      ids.forEach((sp) => { const o = el("option", { value: sp, text: nameOf(sp) }); if (a.sp === sp) o.selected = true; sel.appendChild(o); });
+      sel.onchange = () => { D().adds[k].sp = sel.value; touch(); };
+      const t = el("textarea", { rows: "2", id: "add-" + n + "-" + k, placeholder: "追加する台詞", "aria-label": "追加する台詞" }); t.value = a.text;
+      const c2 = el("span", { class: "count" }); paintCount(c2, a.text);
+      t.oninput = () => { D().adds[k].text = t.value; paintCount(c2, t.value); touch(); };
+      const m = el("input", { type: "text", id: "addmemo-" + n + "-" + k, placeholder: "メモ（任意）" }); m.value = a.memo;
+      m.oninput = () => { D().adds[k].memo = m.value; touch(); };
+      const rm = ibtn({ class: "ghost" }, "trash", "この追加を消す");
+      rm.onclick = () => { D().adds.splice(k, 1); replaceRow(n); };
+      const hd = el("b", {}, [ic("add"), document.createTextNode(" " + pad(n) + " の後")]); hd.title = "追加した台詞。保存は上の行の保存ボタンで";
+      box.appendChild(el("div", { class: "head" }, [hd, rm]));
+      [sel, t, c2, m].forEach((x) => box.appendChild(x));
+      frag.appendChild(box);
+    });
+    return frag;
+  }
+  // What the previous round did to a line, as one chip per kind, so the reviewer sees at a glance
+  // what to check this time (a reading-only change means: listen, the words did not change).
+  const PREV_KINDS = { reading_only: ["sound", "読みだけ変更", true], speaker: ["person", "話し手"], text: ["pen", "台詞"], reading: ["sound", "読み"],
+    voice: ["play", "選んだ声"], voice_new: ["regen", "声を作り直し"], added: ["add", "追加"], carried: ["hist", "前の版から持ち越し"] };
+  function prevBox(p) {
+    const kinds = p.kinds || [], box = el("div", { class: "prev", title: "前の版のチェックで直した行" }, [ic("hist"), document.createTextNode("前回")]);
+    kinds.forEach((k) => {
+      if (k === "reading" && kinds.indexOf("reading_only") >= 0) return;
+      const d = PREV_KINDS[k]; if (!d) return;
+      box.appendChild(el("span", { class: "pchip" + (d[2] ? " strong" : "") }, [ic(d[0]), document.createTextNode(d[1])]));
+    });
+    if (p.note) box.appendChild(el("span", { class: "pnote", text: p.note }));
+    if (kinds.indexOf("reading_only") >= 0) box.appendChild(el("span", { class: "pnote ask", text: "台詞はそのまま。新しい読みの声を ▶ で聞いて確かめてください" }));
+    return box;
+  }
+  function paintCount(node, t) { const c = [...(t || "")].length; node.textContent = c + " 字" + (c > 50 ? "（50字を超えています）" : ""); node.className = "count" + (c > 50 ? " over" : ""); }
+  function paintRow(n) {
+    const btn = $("save-" + n), st = $("state-" + n), row = $("r" + n);
+    if (!btn) return;
+    const dirty = isDirty(n);
+    btn.disabled = !dirty || !!saving[n];
+    btn.classList.toggle("ready", dirty && !saving[n]);
+    const stName = saving[n] ? "wait" : dirty ? "dot" : (savedAt[n] || !same(saved[n], blank(lineOf(n))) ? "check" : "");
+    const stLabel = { wait: "保存中", dot: "未保存", check: "保存済み" }[stName] || "";
+    st.innerHTML = ""; if (stName) st.appendChild(ic(stName)); st.title = stLabel; st.setAttribute("aria-label", stLabel);
+    st.className = "rowstate" + (dirty && !saving[n] ? " warn" : stName === "check" ? " good" : "");
+    if (row) row.classList.toggle("dirty", dirty);
+  }
+  function paintGeneral() {
+    const dirty = generalDraft !== generalSaved;
+    $("saveGeneral").disabled = !dirty;
+    $("saveGeneral").classList.toggle("ready", dirty);
+    const g = $("generalState"), gName = dirty ? "dot" : generalSaved ? "check" : "";
+    g.innerHTML = ""; if (gName) g.appendChild(ic(gName)); g.title = dirty ? "未保存" : generalSaved ? "保存済み" : "";
+    g.className = "rowstate" + (dirty ? " warn" : gName ? " good" : "");
+  }
+  function removeRowNodes(n) {
+    const r = $("r" + n); if (!r) return null;
+    let next = r.nextSibling;
+    while (next && next.classList && next.classList.contains("added")) { const d = next; next = next.nextSibling; d.remove(); }
+    const anchor = r.nextSibling; r.remove(); return anchor;
+  }
+  function replaceRow(n) {
+    const r = $("r" + n);
+    if (!r) { renderAll(); return; }
+    const parent = r.parentNode, anchor = removeRowNodes(n);
+    parent.insertBefore(rowFor(lineOf(n)), anchor);
+    paintRow(n); paintVoice(n); summary();
+  }
+  function rowHasFocus(n) {
+    const act = document.activeElement; if (!act || act === document.body) return false;
+    const r = $("r" + n); if (r && r.contains(act)) return true;
+    const box = act.closest && act.closest(".added"); return !!(box && box.getAttribute("data-row") === String(n));
+  }
+  function renderAll() {
+    const root = $("rows");
+    root.innerHTML = "";
+    if (!lines.length) { root.appendChild(el("div", { class: "empty", text: "この回の台詞がまだありません。" })); summary(); return; }
+    const only = $("onlyChanged").checked;
+    let last = null;
+    lines.forEach((l) => {
+      const s = draft[l.n];
+      const changed = s.st !== "ok" || s.adds.length || isDirty(l.n) || !!voices[l.n] || !!l.prev;
+      if (l.scene !== last) {
+        last = l.scene;
+        if (!only) { const h = el("h2", { class: "scene", id: "sc-" + l.scene, text: l.sceneName || l.scene }); h.appendChild(el("small", { text: l.scene })); root.appendChild(h); }
+      }
+      if (only && !changed) return;
+      root.appendChild(rowFor(l));
+      paintRow(l.n); paintVoice(l.n);
+    });
+    if (only && !root.children.length) root.appendChild(el("div", { class: "empty", text: "変更も声の候補もまだありません（全部採用）。" }));
+    summary();
+  }
+  function renderNav() {
+    const nav = $("nav"); nav.innerHTML = ""; const seen = {};
+    lines.forEach((l) => { if (!seen[l.scene]) { seen[l.scene] = 1; nav.appendChild(el("a", { href: "#sc-" + l.scene, text: l.sceneName || l.scene })); } });
+    nav.querySelectorAll("a").forEach((a) => a.onclick = (e) => { e.preventDefault(); const t = document.getElementById(a.getAttribute("href").slice(1)); if (t) t.scrollIntoView({ block: "start" }); });
+  }
+
+  let current = null;
+  function playSrc(src, btn) {
+    if (!src) return;
+    if (current) { current.pause(); current = null; }
+    const a = new Audio(src);
+    current = a; btn.classList.add("on");
+    a.onended = () => btn.classList.remove("on");
+    a.onerror = () => { btn.classList.remove("on"); btn.title = "再生できません"; };
+    a.play().catch(() => btn.classList.remove("on"));
+  }
+
+  // ---- voice candidates ----
+  // The page cannot reach the voice service (no outside hosts, and the key must
+  // never be in the page), so 「声の候補を作る」 only files a request in the db;
+  // Claude runs make_voice_candidates.py, publishes the takes and marks them ready.
+  const vref = (n) => db.doc("reviews/" + ep + "/voices/" + pad(n));
+  function liveVoice(n) {
+    const v = voices[n];
+    // Candidates made for an older request are hidden: the text or speaker they read may have changed since.
+    return v && v.status === "ready" && v.for_req === v.req && Array.isArray(v.candidates) && v.candidates.length ? v : null;
+  }
+  function audioOf(l) {
+    const v = liveVoice(l.n);
+    const c = v && v.pick ? v.candidates.find((x) => x.k === v.pick) : null;
+    return c ? c.file : l.audio;
+  }
+  // 読みの直し is written like 「刃 → やいば」; apply those pairs so the take reads what was asked.
+  function applyYomi(text, yomi) {
+    yomi.split(/[、,，;；\n]/).forEach((part) => {
+      const m = part.match(/^\s*(.+?)\s*(?:→|->|⇒)\s*(.+?)\s*$/);
+      if (m) text = text.split(m[1]).join(m[2]);
+    });
+    return text;
+  }
+  function voiceRequest(l) {
+    const s = draft[l.n], fix = s.st === "fix";
+    let text = fix && s.text.trim() && s.text.trim() !== l.text ? s.text.trim() : (l.tts || l.text);
+    // 読みの直し is either pairs (「刃 → やいば」) or the whole sentence as it should be read.
+    if (fix && s.yomi.trim()) text = /→|->|⇒/.test(s.yomi) ? applyYomi(text, s.yomi) : s.yomi.trim();
+    return { text, speaker: fix ? (s.sp || l.sp) : l.sp };
+  }
+  function autoVoice(n) {
+    const l = lineOf(n), s = saved[n]; if (!db || !l || !s || !changesVoice(l, s)) return;
+    const r = voiceRequest(l), v = voices[n];
+    if (v && v.text === r.text && v.speaker === r.speaker && v.status !== "failed" && v.status !== "error") return;  // already asked for this reading
+    fileVoice(n, r);
+  }
+  function requestVoice(n) {
+    if (!db) return;
+    const v = voices[n];
+    // A request replaces the takes already made, so once one has been picked it takes a second press.
+    if (liveVoice(n) && v.pick && armedRegen !== n) {
+      armedRegen = n; paintVoice(n);
+      setTimeout(() => { if (armedRegen === n) { armedRegen = null; paintVoice(n); } }, 4000);
+      return;
+    }
+    armedRegen = null;
+    fileVoice(n, voiceRequest(lineOf(n)));
+  }
+  function fileVoice(n, r) {
+    const at = stamp();
+    const doc = { n, req: at, text: r.text, speaker: r.speaker, status: "requested", candidates: [], for_req: "", pick: 0, at };
+    voices[n] = doc; paintVoice(n); refreshPlay(n); summary();
+    const ref = vref(n);
+    enqueue(ref.path, () => ref.set(doc)).catch((err) => { if (voices[n] === doc) { doc.status = "error"; doc.error = (err && err.code) || "error"; paintVoice(n); } });
+  }
+  function pickVoice(n, k) {
+    const v = voices[n]; if (!db || !v) return;
+    v.pick = k; v.at = stamp(); paintVoice(n); refreshPlay(n); summary();
+    const ref = vref(n), at = v.at;
+    enqueue(ref.path, () => ref.update({ pick: k, at })).catch(() => setSync("声の選択を保存できませんでした。もう一度選んでください"));
+  }
+  function refreshPlay(n) {
+    const b = $("play-" + n), l = lineOf(n); if (!b || !l) return;
+    const v = liveVoice(n), src = audioOf(l);
+    b.disabled = !src;
+    const label = !src ? "音声なし" : v && v.pick ? "聞く（候補 " + v.pick + "）" : "聞く";
+    b.innerHTML = ""; b.appendChild(ic("play")); if (src && v && v.pick) b.appendChild(el("span", { class: "badge", text: String(v.pick) }));
+    b.title = label; b.setAttribute("aria-label", label);
+  }
+  function paintVoice(n) {
+    const box = $("vc-" + n), slot = $("vb-" + n), l = lineOf(n); if (!box || !slot || !l) return;
+    refreshPlay(n);
+    box.innerHTML = ""; slot.innerHTML = "";
+    const v = voices[n], live = liveVoice(n), armed = armedRegen === n;
+    const label = armed ? "もう一度押すと作り直します" : live ? "声の候補を作り直す" : v && v.status === "requested" ? "声の候補を依頼し直す" : "声の候補を作る";
+    const btn = ibtn({ class: "regen" + (armed ? " armed" : ""), id: "regen-" + n }, "regen", label, armed ? document.createTextNode("もう一度") : null);
+    if (!db) { btn.disabled = true; btn.title = "この表示では使えません（保存できる表示で開いてください）"; }
+    btn.onclick = () => requestVoice(n);
+    slot.appendChild(btn);
+    if (!v) return;
+    // What the takes read is shown only when it differs from the line on screen (a fix, a reading, another speaker).
+    const differs = v.text !== (l.tts || l.text) || v.speaker !== l.sp;
+    const reads = differs ? el("span", { class: "vstate", text: nameOf(v.speaker) + "「" + v.text + "」" }) : null;
+    const state = (name, text, cls) => { const s = el("span", { class: "vstate" + (cls ? " " + cls : "") }, [ic(name), document.createTextNode(text)]); box.appendChild(s); };
+    if (v.status === "requested" || (v.status === "ready" && !live)) {
+      // Not instant: Claude makes the takes the next time it reads the page (a 反映 or 候補 message both count).
+      state("wait", "次に Claude へ送った時の返事で出ます（「反映して」「候補を作って」どちらでも）", "wait");
+    } else if (v.status === "failed") {
+      state("warn", "作れませんでした: " + (v.error || ""), "wait");
+    } else if (v.status === "error") {
+      state("warn", "依頼を保存できませんでした（" + v.error + "）。もう一度押してください", "wait");
+    } else if (live) {
+      const list = el("div", { class: "cands" });
+      const option = (k, label, mark, src) => {
+        const p = ibtn({}, "play", "聞く: " + label, el("span", { class: "badge", text: mark })); p.onclick = () => playSrc(src, p);
+        const on = v.pick === k;
+        const pk = ibtn({ class: "pickbtn", "aria-pressed": String(on) }, on ? "radioOn" : "radio", on ? label + "を使う（選択中）" : label + "にする");
+        pk.onclick = () => pickVoice(n, k);
+        return el("div", { class: "cand" + (on ? " picked" : "") }, [p, pk]);
+      };
+      if (l.audio) list.appendChild(option(0, "今の声", "今", l.audio));
+      live.candidates.forEach((c) => list.appendChild(option(c.k, "候補 " + c.k, String(c.k), c.file)));
+      box.appendChild(list);
+    }
+    if (reads) box.appendChild(reads);
+  }
+  function applyVoice(n, v) {
+    const cur = voices[n];
+    if (cur && (v.req || "") < (cur.req || "")) return;             // our newer request hasn't landed yet
+    if (cur && cur.req === v.req && (v.at || "") < (cur.at || "")) v = Object.assign({}, v, { pick: cur.pick, at: cur.at });  // keep our newer pick
+    voices[n] = v; paintVoice(n);
+  }
+
+  // ---- summary (saved state = what Claude reads) ----
+  function q(t) { return "「" + t + "」"; }
+  function summary() {
+    let ok = 0, fix = 0, del = 0, add = 0, unsaved = 0;
+    lines.forEach((l) => { const s = saved[l.n], st = stOf(l, s); if (st === "ok") ok++; if (st === "fix") fix++; if (st === "del") del++; add += s.adds.filter((a) => a.text.trim()).length; if (isDirty(l.n)) unsaved++; });
+    if (generalDraft !== generalSaved) unsaved++;
+    const t = $("tally"); t.innerHTML = "";
+    const chip = (cls, name, label, c) => { const s = el("span", { class: cls, title: label + " " + c, "aria-label": label + " " + c }, [ic(name), document.createTextNode(String(c))]); t.appendChild(s); };
+    chip("t-ok", "seal", "採用", ok); chip("t-fix", "pen", "訂正", fix); chip("t-del", "trash", "削除", del); chip("t-add", "add", "追加", add);
+    const u = $("unsaved"); u.hidden = !unsaved; u.innerHTML = ""; u.appendChild(ic("dot")); u.appendChild(document.createTextNode(String(unsaved)));
+    u.title = "未保存 " + unsaved; u.setAttribute("aria-label", "未保存 " + unsaved);
+    $("saveAll").hidden = !unsaved;
+    const out = ["【" + ep + " 台詞チェックの結果】", "採用 " + ok + "／訂正 " + fix + "／削除 " + del + "／追加 " + add + (unsaved ? "　※未保存 " + unsaved + " 件は含みません" : "")];
+    const edits = [], fixes = [], dels = [], adds = [], voicesOut = [];
+    lines.forEach((l) => {
+      const s = saved[l.n], no = pad(l.n), who = nameOf(l.sp);
+      if (stOf(l, s) === "fix") {
+        const spChanged = s.sp && s.sp !== l.sp;
+        fixes.push(no + " " + who + q(l.text));
+        if (spChanged) fixes.push("　話し手: " + who + " → " + nameOf(s.sp));
+        if (s.text.trim() !== l.text) fixes.push("　→ " + q(s.text.trim()));
+        if (s.yomi.trim()) fixes.push("　読み: " + s.yomi.trim());
+        if (s.memo.trim()) fixes.push("　メモ: " + s.memo.trim());
+        const e = { op: "fix", n: l.n, from: l.text, to: s.text.trim(), yomi: s.yomi.trim(), memo: s.memo.trim() };
+        if (spChanged) { e.speaker_from = l.sp; e.speaker_to = s.sp; }
+        edits.push(e);
+      }
+      const v = liveVoice(l.n), c = v && v.pick ? v.candidates.find((x) => x.k === v.pick) : null;
+      if (c) { voicesOut.push(no + " 候補 " + c.k + " " + nameOf(v.speaker) + q(v.text)); edits.push({ op: "voice", n: l.n, take: c.k, file: c.file, speaker: v.speaker, text: v.text }); }
+      if (s.st === "del") { dels.push(no + " " + who + q(l.text) + (s.memo.trim() ? "　メモ: " + s.memo.trim() : "")); edits.push({ op: "del", n: l.n, text: l.text, memo: s.memo.trim() }); }
+      s.adds.filter((a) => a.text.trim()).forEach((a) => { adds.push(no + " の後に " + nameOf(a.sp) + q(a.text.trim()) + (a.memo.trim() ? "　メモ: " + a.memo.trim() : "")); edits.push({ op: "add", after: l.n, speaker: a.sp, text: a.text.trim(), memo: a.memo.trim() }); });
+    });
+    if (fixes.length) out.push("", "■ 訂正", ...fixes);
+    if (dels.length) out.push("", "■ 削除", ...dels);
+    if (adds.length) out.push("", "■ 追加", ...adds);
+    if (voicesOut.length) out.push("", "■ 声の差し替え（選んだ候補）", ...voicesOut);
+    if (generalSaved.trim()) out.push("", "■ 全体コメント", generalSaved.trim());
+    if (!edits.length && !generalSaved.trim()) out.push("", "（変更なし：全部採用）");
+    out.push("", "--- 機械用 ---", JSON.stringify({ episode: ep, edits }));
+    $("out").textContent = out.join(NL);
+  }
+
+  // ---- incoming data ----
+  function applyDoc(n, v) {
+    const l = lineOf(n); if (!l) return;
+    if (isDirty(n) || saving[n]) return;                     // never overwrite unsaved work
+    if (savedAt[n] && (v ? (v.at || "") : "") < savedAt[n]) return;  // older than our own save: stale
+    const next = v ? { st: v.st || "ok", sp: v.sp || l.sp, text: typeof v.text === "string" ? v.text : l.text, yomi: v.yomi || "", memo: v.memo || "", adds: Array.isArray(v.adds) ? v.adds.map((a) => ({ sp: a.sp, text: a.text || "", memo: a.memo || "" })) : [] } : blank(l);
+    const changed = !same(next, saved[n]);
+    if (v && v.at) savedAt[n] = v.at;
+    if (!changed) return;
+    saved[n] = next; draft[n] = clone(next);
+    if (changed && $("r" + n) && !rowHasFocus(n)) replaceRow(n);
+    else paintRow(n);
+  }
+
+  async function loadIndex() {
+    try { const r = await fetch("data/index.json", { cache: "no-store" }); return (await r.json()).episodes || []; }
+    catch (e) { return []; }
+  }
+  async function openEpisode(id) {
+    unsubs.forEach((u) => { try { u(); } catch (e) {} }); unsubs = [];
+    ep = id; $("rows").innerHTML = '<div class="empty">台詞を読み込んでいます…</div>';
+    try {
+      const r = await fetch("data/" + id + ".json", { cache: "no-store" });
+      const d = await r.json(); title = d.title || id; lines = d.lines || [];
+      setSpeakers(d.speakers);
+    } catch (e) { lines = []; setSpeakers(null); }
+    [draft, saved, savedAt, saving, voices].forEach((o) => Object.keys(o).forEach((k) => delete o[k]));
+    armedRegen = null;
+    lines.forEach((l) => { saved[l.n] = blank(l); draft[l.n] = blank(l); });
+    generalDraft = generalSaved = ""; generalAt = "";
+    if (!db) loadLocal();
+    // An episode made from a previous round opens on its changed lines; the viewer's own choice per episode wins.
+    let only = null; try { only = localStorage.getItem("daihon-mirune:only:" + ep); } catch (e) {}
+    $("onlyChanged").checked = only === null ? lines.some((l) => l.prev) : only === "1";
+    renderNav(); renderAll();
+    $("general").value = generalDraft; paintGeneral();
+    if (!db) return;
+    unsubs.push(db.collection("reviews/" + ep + "/lines").onSnapshot((snap) => {
+      const seen = {};
+      snap.docs.forEach((d) => { const v = d.data(); if (v && typeof v.n === "number") { seen[v.n] = 1; applyDoc(v.n, v); } });
+      lines.forEach((l) => { if (!seen[l.n] && !savedAt[l.n]) applyDoc(l.n, null); });
+      summary();
+      if (!snap.metadata.hasPendingWrites) setSync("同期済み（PC・スマホ共通）");
+    }, (err) => setSync("同期が止まりました（" + err.code + "）。再読み込みしてください")));
+    unsubs.push(db.collection("reviews/" + ep + "/voices").onSnapshot((snap) => {
+      snap.docs.forEach((d) => { const v = d.data(); if (v && typeof v.n === "number" && lineOf(v.n)) applyVoice(v.n, v); });
+      // In 変更・候補だけ, a line that just got a voice request must appear even though it was filtered out a moment ago.
+      const act = document.activeElement;
+      if ($("onlyChanged").checked && Object.keys(voices).some((n) => !$("r" + n)) && !(act && $("rows").contains(act))) renderAll();
+      summary();
+    }, () => {}));
+    unsubs.push(db.doc("reviews/" + ep).onSnapshot((d) => {
+      const v = d.exists ? d.data() : null;
+      if (generalDraft !== generalSaved) return;
+      if (generalAt && (!v || (v.at || "") < generalAt)) return;
+      generalSaved = generalDraft = (v && v.general) || ""; if (v && v.at) generalAt = v.at;
+      if (document.activeElement !== $("general")) $("general").value = generalDraft;
+      paintGeneral(); summary();
+    }, () => {}));
+  }
+
+  // ---- 話し手 tab: the live registry ----
+  const ID_RE = /^[A-Za-z0-9_-]+$/, VOICE_RE = /^[0-9a-fA-F]{32}$/;
+  let spEditing = null, spArmed = null, rowsStale = false;
+  function showView(name) {
+    [["lines", "p-lines"], ["sp", "p-sp"]].forEach(([t, p]) => { const on = t === name; $("tab-" + t).setAttribute("aria-selected", String(on)); $("tab-" + t).tabIndex = on ? 0 : -1; $(p).hidden = !on; });
+    spArmed = null; paintRoster();
+    if (name === "lines" && rowsStale) { rowsStale = false; renderAll(); }
+  }
+  function showSub(name) {
+    [["list", "sp-list"], ["add", "sp-add"]].forEach(([t, p]) => { const on = t === name; $("stab-" + t).setAttribute("aria-selected", String(on)); $("stab-" + t).tabIndex = on ? 0 : -1; $(p).hidden = !on; });
+    spArmed = null; paintRoster();
+  }
+  $("tab-lines").onclick = () => showView("lines"); $("tab-sp").onclick = () => showView("sp");
+  $("stab-list").onclick = () => showSub("list"); $("stab-add").onclick = () => showSub("add");
+  function checkSp(id, voice, self) {
+    const r = { id: "", voice: "" };
+    if (!id) r.id = "ID を入れてください";
+    else if (!ID_RE.test(id)) r.id = "ID に使えるのは英数字・_・- だけです";
+    else if (id !== self && SPK[id]) r.id = "「" + id + "」はもう登録されています";
+    if (voice && !VOICE_RE.test(voice)) r.voice = "Fish Audio の声 ID は 32 桁の英数字です（このままでも登録はできます）";
+    return r;
+  }
+  function writeSpeaker(id, data) {
+    if (!db) return Promise.reject({ code: "no_db" });
+    const ref = db.doc("speakers/" + id), doc = Object.assign({ id, at: stamp() }, data);
+    dbSpeakers[id] = doc; speakersChanged();   // show it at once; the snapshot confirms
+    return enqueue(ref.path, () => ref.set(doc));
+  }
+  function speakersChanged() {
+    rebuildSpeakers(); paintRoster();
+    // Re-render the script only when nobody is typing in it; otherwise on the next return to it.
+    const act = document.activeElement;
+    if ($("p-lines").hidden || (act && $("rows").contains(act))) rowsStale = true; else { renderAll(); summary(); }
+  }
+  function paintRoster() {
+    const ul = $("roster"); ul.innerHTML = "";
+    const ids = Object.keys(SPK);
+    $("nSp").textContent = "（" + ids.length + "）";
+    if (!db) ul.appendChild(el("li", { class: "hint", text: "この表示では登録できません（保存できる表示で開いてください）。" }));
+    if (!ids.length) { ul.appendChild(el("li", { class: "hint", text: "まだ誰も登録されていません。「新しく追加」から登録してください。" })); return; }
+    ids.forEach((id) => {
+      const s = SPK[id], chip = el("span", { class: "who", text: NAMES[id] }); chip.style.background = COLORS[id];
+      const meta = el("div", { class: "meta" }, [
+        el("span", {}, [document.createTextNode("ID "), el("b", { text: id })]),
+        el("span", {}, [document.createTextNode("声 "), el("b", { text: s.voice || "既定の声" })])
+      ]);
+      const ed = ibtn({ id: "spedit-" + id }, "pen", NAMES[id] + " を直す"); ed.disabled = !db;
+      ed.onclick = () => { spEditing = spEditing === id ? null : id; spArmed = null; paintRoster(); const f = $("spn-" + id); if (f) f.focus(); };
+      const armed = spArmed === id;
+      const del = ibtn({ class: "del" + (armed ? " armed" : ""), id: "spdel-" + id }, "trash", armed ? "もう一度押すと消えます" : NAMES[id] + " を消す", armed ? document.createTextNode("もう一度") : null); del.disabled = !db;
+      del.onclick = () => {
+        if (spArmed !== id) { spArmed = id; paintRoster(); $("spdel-" + id).focus(); return; }
+        spArmed = null; spEditing = null;
+        // Keep the name and color, so lines that already use this speaker still show who it was.
+        writeSpeaker(id, { deleted: true, name: s.name || "", color: COLORS[id], voice: s.voice || "" }).catch(() => setSync("話し手を消せませんでした。もう一度押してください"));
+      };
+      const li = el("li", {}, [chip, meta, el("div", { class: "acts" }, [ed, del])]);
+      if (spEditing === id) li.appendChild(spEditBox(id, s));
+      ul.appendChild(li);
+    });
+  }
+  function spEditBox(id, s) {
+    const name = el("input", { type: "text", id: "spn-" + id, placeholder: id }); name.value = s.name || "";
+    const color = el("input", { type: "color", id: "spc-" + id }); color.value = COLORS[id];
+    const voice = el("input", { type: "text", id: "spv-" + id, placeholder: "空ならサービスの既定の声", autocomplete: "off", spellcheck: "false" }); voice.value = s.voice || "";
+    const vErr = el("div", { class: "err" });
+    voice.oninput = () => { vErr.textContent = checkSp(id, voice.value.trim(), id).voice; };
+    const save = el("button", { type: "button", class: "primary", text: "この内容で保存" });
+    const cancel = el("button", { type: "button", class: "secondary", text: "やめる" });
+    save.onclick = () => { spEditing = null; writeSpeaker(id, { name: name.value.trim(), color: color.value, voice: voice.value.trim() }).catch(() => setSync("話し手を保存できませんでした")); };
+    cancel.onclick = () => { spEditing = null; paintRoster(); };
+    const cell = (cap, input, extra, cls) => el("div", cls ? { class: cls } : {}, [el("label", { for: input.id, text: cap }), input, extra]);
+    return el("div", { class: "edit" }, [
+      el("div", { class: "spfields" }, [cell("表示名", name), cell("色", color), cell("声 ID", voice, vErr, "full")]),
+      el("p", { class: "hint", text: "ID（" + id + "）は台本と結びついているので変えられません。" }),
+      el("div", { class: "sprow" }, [save, cancel])
+    ]);
+  }
+  function nextColor() { return PALETTE.find((c) => !Object.keys(SPK).some((id) => (COLORS[id] || "").toLowerCase() === c.toLowerCase())) || PALETTE[Object.keys(SPK).length % PALETTE.length]; }
+  function paintSpChip() { $("spChip").textContent = $("spName").value.trim() || $("spId").value.trim() || "プレビュー"; $("spChip").style.background = $("spColor").value; }
+  function resetSpForm() { $("spId").value = ""; $("spName").value = ""; $("spVoice").value = ""; $("spColor").value = nextColor(); $("spIdErr").textContent = ""; $("spVoiceErr").textContent = ""; paintSpChip(); }
+  $("spId").oninput = () => { const v = $("spId").value.trim(); $("spIdErr").textContent = v ? checkSp(v, "", null).id : ""; $("spMsg").textContent = ""; paintSpChip(); };
+  $("spName").oninput = paintSpChip; $("spColor").oninput = paintSpChip;
+  $("spVoice").oninput = () => { $("spVoiceErr").textContent = checkSp("x", $("spVoice").value.trim(), "x").voice; };
+  $("sp-add").onsubmit = (e) => {
+    e.preventDefault();
+    const id = $("spId").value.trim(), name = $("spName").value.trim(), voice = $("spVoice").value.trim();
+    const r = checkSp(id, voice, null);
+    $("spIdErr").textContent = r.id; $("spVoiceErr").textContent = r.voice;
+    if (r.id) { $("spId").focus(); return; }
+    if (!db) { $("spMsg").className = "msg"; $("spMsg").textContent = "この表示では登録できません"; return; }
+    writeSpeaker(id, { name, color: $("spColor").value, voice }).then(
+      () => { $("spMsg").className = "msg good"; $("spMsg").textContent = "「" + (name || id) + "」を登録しました。台詞の話し手から選べます"; },
+      () => { $("spMsg").className = "msg"; $("spMsg").textContent = "登録できませんでした。もう一度押してください"; });
+    resetSpForm(); $("spId").focus();
+  };
+  // A speaker change that arrived while a line was being edited is applied once focus leaves the script.
+  $("rows").addEventListener("focusout", () => setTimeout(() => {
+    const act = document.activeElement;
+    if (rowsStale && !$("p-lines").hidden && !(act && $("rows").contains(act))) { rowsStale = false; renderAll(); summary(); }
+  }, 0));
+  function watchSpeakers() {
+    if (!db) return;
+    db.collection("speakers").onSnapshot((snap) => {
+      const next = {};
+      snap.docs.forEach((d) => { const v = d.data(); if (v && v.id && ID_RE.test(v.id)) next[v.id] = v; });
+      // Keep a local write the snapshot hasn't caught up with yet.
+      Object.keys(dbSpeakers).forEach((id) => { if (!next[id] || (next[id].at || "") < (dbSpeakers[id].at || "")) next[id] = dbSpeakers[id]; });
+      if (same(next, dbSpeakers)) return;
+      dbSpeakers = next; speakersChanged();
+    }, () => {});
+  }
+
+  // Static icons in the markup, and the legend that teaches the symbols once at the top.
+  document.querySelectorAll("[data-ic]").forEach((s) => s.replaceWith(ic(s.getAttribute("data-ic"))));
+  $("onlyIc").replaceWith(ic("filter"));
+  $("saveAll").appendChild(ic("save")); $("saveAll").appendChild(document.createTextNode("まとめて"));
+  $("saveGeneral").appendChild(ic("save"));
+  [["l-ok", "seal", "採用（はじめは全部）"], ["l-fix", "pen", "訂正"], ["l-del", "trash", "削除"], ["l-add", "add", "台詞を足す"], ["", "save", "行を保存（PC・スマホ共通）"], ["l-acc", "regen", "声の候補"], ["l-acc", "hist", "前回直した行"]]
+    .forEach(([cls, name, text]) => { const i = ic(name); if (cls) i.classList.add(cls); $("legend").appendChild(el("li", {}, [i, document.createTextNode(text)])); });
+  $("onlyChanged").onchange = () => { try { localStorage.setItem("daihon-mirune:only:" + ep, $("onlyChanged").checked ? "1" : "0"); } catch (e) {} renderAll(); };
+  $("general").oninput = () => { generalDraft = $("general").value; paintGeneral(); summary(); };
+  $("saveGeneral").onclick = saveGeneral;
+  $("saveAll").onclick = async () => {
+    const dirty = lines.filter((l) => isDirty(l.n)).map((l) => l.n);
+    for (const n of dirty) await saveRow(n);
+    if (generalDraft !== generalSaved) await saveGeneral();
+  };
+  $("ep").onchange = () => { const id = $("ep").value; try { history.replaceState(null, "", "#" + id); } catch (e) {} openEpisode(id); };
+  $("copy").onclick = async () => {
+    const t = $("out").textContent; let ok = false;
+    try { await navigator.clipboard.writeText(t); ok = true; }
+    catch (e) { const r = document.createRange(); r.selectNodeContents($("out")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+    $("msg").textContent = ok ? "コピーしました。チャットに貼り付けられます" : "コピーできなかったので結果を選択しました。長押しでコピーしてください";
+  };
+  let armed = false;
+  $("reset").onclick = async () => {
+    const b = $("reset");
+    const lab = $("resetLabel");
+    if (!armed) { armed = true; b.classList.add("armed"); lab.textContent = "本当に戻す？（もう一度押す）"; setTimeout(() => { armed = false; b.classList.remove("armed"); lab.textContent = "この回のチェックを最初に戻す"; }, 4000); return; }
+    armed = false; b.classList.remove("armed"); lab.textContent = "この回のチェックを最初に戻す";
+    const targets = lines.filter((l) => !same(saved[l.n], blank(l)) || isDirty(l.n)).map((l) => l.n);
+    targets.forEach((n) => { draft[n] = blank(lineOf(n)); });
+    renderAll();
+    for (const n of targets) await saveRow(n);
+    generalDraft = ""; $("general").value = ""; await saveGeneral();
+  };
+  window.addEventListener("beforeunload", (e) => { if (lines.some((l) => isDirty(l.n))) { e.preventDefault(); e.returnValue = ""; } });
+
+  (async () => {
+    const eps = await loadIndex();
+    const sel = $("ep"); sel.innerHTML = "";
+    eps.forEach((e) => sel.appendChild(el("option", { value: e.id, text: e.title + "（" + e.lines + "行）" })));
+    const want = (location.hash || "").slice(1);
+    const first = eps.find((e) => e.id === want) || eps[0];
+    if (!first) { $("rows").innerHTML = '<div class="empty">チェックできる回がまだありません。</div>'; setSync(""); return; }
+    sel.value = first.id;
+    setSync("接続中…");
+    try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; } catch (e) { db = null; }
+    await openEpisode(first.id);
+    watchSpeakers(); resetSpForm(); paintRoster();
+    setSync(db ? "同期中…" : "この表示ではこの端末だけに保存します");
+  })();
+})();
+</script>
